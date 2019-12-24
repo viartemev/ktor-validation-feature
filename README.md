@@ -1,7 +1,7 @@
 # Ktor validation feature
 [![Build Status](https://travis-ci.com/viartemev/ktor-validation-feature.svg?branch=master)](https://travis-ci.com/viartemev/ktor-validation-feature)
 
-Validation is important part of each API. This feature provides a simple way for incoming request validation.
+Validation is an important part of each API. This feature provides a simple way for incoming request validation.
 
 Let's imagine we have request object which must be validated:
 ```kotlin
@@ -41,8 +41,8 @@ post("/messages") {
     call.respond(message)
 }
 ```
-2. If you don't want to throw exception, you should set `throwExceptionIfInvalid` to `false`. 
-In this case, you could get validation result by calling: `call.receiveValidated<T>()` which return `Pair<T, ValidationResult>`.
+2. If you don't want to throw the exception, you should set `throwExceptionIfInvalid` to `false`. 
+In this case, you could get validation result by calling: `call.receiveValidated<T>()` which returns `Pair<T, ValidationResult>`.
 `ValidationResult` is sealed class, can be:
     - `NotValidated` - in case validators weren't provided
     - `Valid` - in case validation finished successfully
