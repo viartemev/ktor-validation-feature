@@ -6,5 +6,5 @@ typealias ValidationError = String
 sealed class ValidationResult {
     object NotValidated : ValidationResult()
     object Valid : ValidationResult()
-    class Invalid(private val errors: Map<PropertyPath, List<ValidationError>>) : ValidationResult()
+    class Invalid(val errors: Map<PropertyPath, List<ValidationError>>) : ValidationResult()
 }
