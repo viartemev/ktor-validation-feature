@@ -25,6 +25,11 @@ install(StatusPages) {
         call.respond(HttpStatusCode.BadRequest, cause.validationResult)
     }
 }
+
+post("/") {
+    val (msg, validatedResult) = call.receive<Message>()
+    call.respond("Done")
+}
 ```
 #### If you would like to get a resulted object with validation result:
 ```kotlin
