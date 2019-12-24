@@ -1,4 +1,6 @@
 # Ktor validation feature
+[![Build Status](https://travis-ci.com/viartemev/ktor-validation-feature.svg?branch=master)](https://travis-ci.com/viartemev/ktor-validation-feature)
+
 Validation is important part of each API. This feature provides a simple way for incoming request validation.
 
 Let's imagine we have request object which must be validated:
