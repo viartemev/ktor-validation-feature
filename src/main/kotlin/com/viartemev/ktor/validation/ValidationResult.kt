@@ -4,6 +4,7 @@ typealias PropertyPath = String
 typealias ValidationError = String
 
 sealed class ValidationResult {
-    class Invalid(val errors: Map<PropertyPath, List<ValidationError>> = HashMap()) : ValidationResult()
+    object NotValidated : ValidationResult()
     object Valid : ValidationResult()
+    class Invalid(private val errors: Map<PropertyPath, List<ValidationError>>) : ValidationResult()
 }
