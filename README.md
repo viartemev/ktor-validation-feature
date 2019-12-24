@@ -1,48 +1,62 @@
 # Ktor validation feature
+Validation is important part of each API. This feature provides a simple way for incoming request validation.
 
-#### Examples:
-Define custom validator:
+Let's imagine we have request object which must be validated:
 ```kotlin
-object MessageValidator : Validator {
+data class Message(val id: Long, val message: String)
+```
+First of all, we need to implement validation logic implementing `Validator` interface:
+```kotlin
+object MessageValidator : Validator<Message> {
 
     override fun supports(clazz: KClass<*>): Boolean = Message::class == clazz
 
-    override fun validate(obj: Any): ValidationResult {
-        val errors = mapOf("name" to listOf("name should be bigger than 3"))
-        return ValidationResult.Invalid(errors)
+    override fun validate(obj: Message): ValidationResult {
+        val errors = mutableMapOf<PropertyPath, List<ValidationError>>()
+        if (obj.message.isBlank()) errors["message"] = listOf("message must be not blank")
+        return ValidationResult.Invalid(errors.toMap())
     }
 }
 ```
-#### If you would like throw RequestValidationException if request body is not valid:
+Then we need to configure the feature. There are 2 options:
+1. If object validation fails (object is not valid), then we get `RequestValidationException`, which we need handle.
+One of the options is StatusPage feature.
 ```kotlin
 install(ValidationFeature) {
-    validators = listOf(MessageValidator)
-    throwExceptionIfInvalid = true //default value is true
+    validators = listOf(MessageValidator) //add MessageValidator to feature
 }
 
+//StatusPages feature is optional, otherwise you should care about exception handling by yourself
 install(StatusPages) {
-    exception<RequestValidationException> { cause ->
-        call.respond(HttpStatusCode.BadRequest, cause.validationResult)
+    exception<RequestValidationException> { cause -> 
+        call.respond(HttpStatusCode.BadRequest, cause.validationResult) 
     }
 }
 
-post("/") {
-    val (msg, validatedResult) = call.receive<Message>()
-    call.respond("Done")
+// Some logic is here
+post("/messages") {
+    val message = call.receive<Message>()
+    call.respond(message)
 }
 ```
-#### If you would like to get a resulted object with validation result:
+2. If you don't want to throw exception, you should set `throwExceptionIfInvalid` to `false`. 
+In this case, you could get validation result by calling: `call.receiveValidated<T>()` which return `Pair<T, ValidationResult>`.
+`ValidationResult` is sealed class, can be:
+    - `NotValidated` - in case validators weren't provided
+    - `Valid` - in case validation finished successfully
+    - `Invalid` - in case validation failed
 ```kotlin
 install(ValidationFeature) {
-    validators = listOf(MessageValidator)
-    throwExceptionIfInvalid = false
+    validators = listOf(MessageValidator) //add MessageValidator to feature
+    throwExceptionIfInvalid = false //by default, it is true
 }
 
-post("/") {
+post("/messages") {
     val (msg, validatedResult) = call.receiveValidated<Message>()
     when (validatedResult) {
-        is ValidationResult.Valid -> call.respond("Done")
-        is ValidationResult.Invalid -> call.respond(HttpStatusCode.BadRequest, "Request is invalid, errors: ${validatedResult.errors}")
+        is ValidationResult.NotValidated -> call.respond(msg.message)
+        is ValidationResult.Valid -> call.respond(msg)
+        is ValidationResult.Invalid -> call.respond(HttpStatusCode.BadRequest, validatedResult.errors)    
     }
 }
 ```

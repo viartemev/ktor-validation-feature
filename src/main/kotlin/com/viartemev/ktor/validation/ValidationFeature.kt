@@ -22,7 +22,7 @@ class ValidationFeature(configuration: Configuration) {
     private val throwExceptionIfInvalid = configuration.throwExceptionIfInvalid
 
     class Configuration {
-        var validators: List<Validator> = emptyList()
+        var validators: List<Validator<*>> = emptyList()
         var throwExceptionIfInvalid = true
     }
 
@@ -50,7 +50,7 @@ class ValidationFeature(configuration: Configuration) {
                 val validationResult = try {
                     feature.validators
                         .find { it.supports(receive.type) }
-                        ?.validate(receive.value)
+                        ?.castAndValidate(receive.value)
                 } catch (e: Throwable) {
                     throw ValidationException(e.localizedMessage)
                 }
