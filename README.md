@@ -65,7 +65,7 @@ post("/messages") {
 
 ### Improvements
 Add validated function for Routers
-```
+```kotlin
 post("/") = validated {
     val (msg, validatedResult) = call.receiveValidated<Message>()
     when (validatedResult) {
