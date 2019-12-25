@@ -63,3 +63,15 @@ post("/messages") {
 }
 ```
 
+### Improvements
+Add validated function for Routers
+```
+post("/") = validated {
+    val (msg, validatedResult) = call.receiveValidated<Message>()
+    when (validatedResult) {
+        is ValidationResult.NotValidated -> call.respond(msg.message)
+        is ValidationResult.Valid -> call.respond(msg)
+        is ValidationResult.Invalid -> call.respond(HttpStatusCode.BadRequest, validatedResult.errors)
+    }
+}
+```
