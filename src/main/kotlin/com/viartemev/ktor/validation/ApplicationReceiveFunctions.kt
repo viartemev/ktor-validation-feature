@@ -21,8 +21,7 @@ suspend inline fun <reified T : Any> ApplicationCall.receiveOrNullValidated(): P
     receiveOrNull<T>() to (request.call.attributes.getOrNull(ValidationFeatureKey) ?: ValidationResult.NotValidated)
 
 suspend fun <T : Any> ApplicationCall.receiveOrNullValidated(type: KClass<T>): Pair<T?, ValidationResult> =
-    receiveOrNull<T>(type.starProjectedType) to (request.call.attributes.getOrNull(ValidationFeatureKey)
-        ?: ValidationResult.NotValidated)
+    receiveOrNull<T>(type.starProjectedType) to (request.call.attributes.getOrNull(ValidationFeatureKey) ?: ValidationResult.NotValidated)
 
 suspend fun <T : Any> ApplicationCall.receiveOrNullValidated(type: KType): Pair<T?, ValidationResult> =
     receiveOrNull<T>(type) to (request.call.attributes.getOrNull(ValidationFeatureKey) ?: ValidationResult.NotValidated)
